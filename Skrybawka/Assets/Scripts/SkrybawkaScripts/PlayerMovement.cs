@@ -17,14 +17,16 @@ public class PlayerMovement : MonoBehaviour
 
     public int maxJumps;
     private int jumpCount = 0;
-
+    
     Animator anim;
+    SpriteRenderer spRenderer;
 
     private void Awake() // Runs first
     {
         // Grab components references
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        spRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -34,19 +36,25 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        rb2d.velocity = new Vector2(x * playerSpeed, rb2d.velocity.y);
+        float xAxis = Input.GetAxisRaw("Horizontal");
+        rb2d.velocity = new Vector2(xAxis * playerSpeed, rb2d.velocity.y);
 
-        anim.SetFloat("Speed", x); // Tell animator to start (or stop) running
+        anim.SetFloat("Speed", Mathf.Abs(xAxis)); // Tell animator to start (or stop) running
 
-        // TODO flipping character sprite
+        if(xAxis < 0) // Flip our sprite on Y axis
+        {
+            spRenderer.flipX = true;
+        }
+        else
+        {
+            spRenderer.flipX = false;
+        }
     }
 
     public void Jump()
     {
-        // TODO jump animation
-
         isOnGround = Physics2D.OverlapCircle(groundDetection.position, detectionRadius, groundMask);
+        anim.SetBool("IsGrounded", isOnGround); // Tell animator to jump
 
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -64,3 +72,5 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 }
+
+
